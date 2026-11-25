@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev -p 4317 -H 0.0.0.0",
     "build": "next build && node scripts/migrate.mjs",
-    "start": "next start -p ${PORT:-4317}",
+    "build:app": "next build",
+    "start": "node scripts/migrate.mjs && next start -p ${PORT:-4317}",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },

@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: us-government-news
+    runtime: node
+    plan: free
+    # Migrations run at start (npm start): Render's build step cannot reach the private database.
+    buildCommand: npm ci && npm run build:app
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: us-government-news-db
+          property: connectionString
+      - key: CRON_SECRET
+        generateValue: true
+      - key: X_BEARER_TOKEN
+        sync: false
+
+  # Optional: guarantees the 22:00 GMT update even while the free web service is asleep.
+  # Render cron jobs are a paid feature; uncomment if your workspace has billing enabled.
+  # - type: cron
+  #   name: us-government-news-daily
+  #   runtime: node
+  #   plan: starter
+  #   schedule: "0 22 * * *"
+  #   buildCommand: "true"
+  #   startCommand: 'curl -fsS -m 290 -H "Authorization: Bearer $CRON_SECRET" "http://$APP_HOSTPORT/api/cron"'
+  #   envVars:
+  #     - key: CRON_SECRET
+  #       fromService:
+  #         type: web
+  #         name: us-government-news
+  #         envVarKey: CRON_SECRET
+  #     - key: APP_HOSTPORT
+  #       fromService:
+  #         type: web
+  #         name: us-government-news
+  #         property: hostport
+
+databases:
+  - name: us-government-news-db
+    plan: free
+    databaseName: tracker
+    user: tracker
+    ipAllowList: []

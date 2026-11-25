@@ -31,6 +31,16 @@ Open http://localhost:4317. On first load the tracker runs an initial update cov
 
 Locally the app stores data in an embedded Postgres (PGlite) under `.data/pglite`. Delete that folder to start fresh. When `DATABASE_URL` is set, it uses that Postgres database instead, and `npm run build` applies the SQL in `migrations/`.
 
+## Deploy on Render
+
+The repo includes a `render.yaml` Blueprint that creates a Node web service and a Postgres database.
+
+1. In Render, choose **New → Blueprint** and connect this repository (branch `main`).
+2. Render reads `render.yaml` and creates `us-government-news` (web) and `us-government-news-db` (Postgres). It generates `CRON_SECRET` and asks for `X_BEARER_TOKEN`, which you can leave empty.
+3. Click **Apply**. Database migrations run when the server starts, and the first update runs automatically.
+
+Both use Render's free plans. On free plans, the web service sleeps after about 15 minutes without visitors, so the 22:00 GMT timer can't fire while it's asleep. The missed update runs on the next visit. To get exactly 22:00 GMT, either uncomment the cron job in `render.yaml` (a paid Render feature) or point a free external scheduler (for example cron-job.org) at `https://<your-app>.onrender.com/api/cron` daily at 22:00 GMT, with the header `Authorization: Bearer <CRON_SECRET>`. Render's free Postgres expires after 30 days unless you upgrade it.
+
 ## How the daily update works
 
 The update is designed to happen at 22:00 GMT even on hosts that pause idle servers:
