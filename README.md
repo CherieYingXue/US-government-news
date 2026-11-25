@@ -39,7 +39,7 @@ The repo includes a `render.yaml` Blueprint that creates a Node web service and 
 2. Render reads `render.yaml` and creates `us-government-news` (web) and `us-government-news-db` (Postgres). It generates `CRON_SECRET` and asks for `X_BEARER_TOKEN`, which you can leave empty.
 3. Click **Apply**. Database migrations run when the server starts, and the first update runs automatically.
 
-Both use Render's free plans. On free plans, the web service sleeps after about 15 minutes without visitors, so the 22:00 GMT timer can't fire while it's asleep. The missed update runs on the next visit. To get exactly 22:00 GMT, either uncomment the cron job in `render.yaml` (a paid Render feature) or point a free external scheduler (for example cron-job.org) at `https://<your-app>.onrender.com/api/cron` daily at 22:00 GMT, with the header `Authorization: Bearer <CRON_SECRET>`. Render's free Postgres expires after 30 days unless you upgrade it.
+The Blueprint uses paid instances: a **Starter** web service, which stays awake so the built-in timer runs the 22:00 GMT update on schedule, and a **Basic-256mb** Postgres database. Render allows only one free database per workspace regardless of the workspace plan. To use free instances instead, set `plan: free` in `render.yaml`. A free web service sleeps after about 15 minutes without visitors, and the missed update then runs on the next visit. A free database expires after 30 days.
 
 ## How the daily update works
 

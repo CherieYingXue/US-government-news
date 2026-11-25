@@ -2,7 +2,8 @@ services:
   - type: web
     name: us-government-news
     runtime: node
-    plan: free
+    # An always-on instance lets the built-in timer run the 22:00 GMT update; "free" sleeps when idle.
+    plan: starter
     # Migrations run at start (npm start): Render's build step cannot reach the private database.
     buildCommand: npm ci && npm run build:app
     startCommand: npm start
@@ -20,8 +21,7 @@ services:
       - key: X_BEARER_TOKEN
         sync: false
 
-  # Optional: guarantees the 22:00 GMT update even while the free web service is asleep.
-  # Render cron jobs are a paid feature; uncomment if your workspace has billing enabled.
+  # Optional backup trigger for the 22:00 GMT update; only needed if the web service uses the free plan.
   # - type: cron
   #   name: us-government-news-daily
   #   runtime: node
@@ -43,7 +43,8 @@ services:
 
 databases:
   - name: us-government-news-db
-    plan: free
+    # Render allows one free database per workspace, whatever the workspace plan.
+    plan: basic-256mb
     databaseName: tracker
     user: tracker
     ipAllowList: []
